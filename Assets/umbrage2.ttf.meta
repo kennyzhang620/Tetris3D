@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: e58f5b540c08c4140bdbb159aae387f0
+timeCreated: 1589666184
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Umbrage
+  fontNames:
+  - Umbrage
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
