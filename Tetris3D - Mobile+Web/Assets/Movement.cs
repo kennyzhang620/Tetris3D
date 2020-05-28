@@ -23,13 +23,14 @@ public class Movement : MonoBehaviour
     public Vector3 prevVtr = new Vector3(0, 0, 0);
     Quaternion prevQuat;
     int prevRot = 0;
-    bool prevCoord = false;
+    public bool prevCoord = false;
 
     bool enabled = true;
     float TimeElapsed = 0;
+
     void OnCollisionStay(Collision obj)
     {
-        if ((obj.gameObject.tag == "Base" || obj.gameObject.tag == "GameObj") && Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") <= 0 && prevCoord == false)
+        if ((obj.gameObject.tag == "Base" || obj.gameObject.tag == "GameObj") && Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") <= 0 && GameData.touchX == 0 && !prevCoord)
         {
             collision = true;
         }
@@ -80,38 +81,77 @@ public class Movement : MonoBehaviour
             {
                 if (!DisableInput)
                 {
+                    if (contact == true)
+                    {
+                        if (!(prevVtr.x == 0 && prevVtr.y == 0 && prevVtr.z == 0))
+                        {
+                                curr.position = prevVtr;
+                                curr.rotation = prevQuat;
+                                Rotation = prevRot;
+                        }
+                        else
+                        {
+                            curr.position = GameData.defaultCoords;
+                        }
+                    }
+
                     if (TimeElapsed < 0.05f)
                         TimeElapsed += Time.deltaTime;
                     else
                     {
                         TimeElapsed = 0;
 
-                        if (contact == true)
+
+                        if (GameData.touchX != 0)
                         {
-                            if (!(prevVtr.x == 0 && prevVtr.y == 0 && prevVtr.z == 0))
+                            if (!contact)
                             {
-                                curr.position = prevVtr;
-                                curr.rotation = prevQuat;
-                                Rotation = prevRot;
-                                prevCoord = true;
-                                GameData.ScanLines = true;
-                            }
-                            else
-                            {
-                                curr.position = GameData.defaultCoords;
+                                prevVtr = curr.position;
+                                prevQuat = curr.rotation;
+                                prevRot = Rotation;
+
+                                curr.position = new Vector3(GameData.touchX, curr.position.y, curr.position.z);
+
+                                if (contact)
+                                {
+                                    curr.position = prevVtr;
+                                    curr.rotation = prevQuat;
+                                    Rotation = prevRot;
+
+                                    prevCoord = true;
+                                }
                             }
                         }
 
+                        print("ROT: " + Rotation);
                         if (Input.GetAxis("Vertical") != 0 || GameData.inY != 0)
                         {
+                            if (GameData.IterationCount > 0)
+                                GameData.IterationCount--;
 
-                            if (Input.GetAxis("Vertical") > 0 || GameData.inY > 0 && active == 0)
+                            if ((Input.GetAxis("Vertical") > 0 || GameData.inY > 0) && active == 0)
                             {
-                                curr.Rotate(0.0f, 0.0f, -90.0f, Space.Self);
-                                if (Rotation < 3)
-                                    Rotation++;
-                                else
-                                    Rotation = 0;
+                                if (!contact)
+                                {
+                                    prevVtr = curr.position;
+                                    prevQuat = curr.rotation;
+                                    prevRot = Rotation;
+
+                                    curr.Rotate(0.0f, 0.0f, -90.0f, Space.Self);
+                                    if (Rotation < 3)
+                                        Rotation++;
+                                    else
+                                        Rotation = 0;
+
+                                    if (contact)
+                                    {
+                                        curr.position = prevVtr;
+                                        curr.rotation = prevQuat;
+                                        Rotation = prevRot;
+
+                                        prevCoord = true;
+                                    }
+                                }
                             }
 
                             if (Input.GetAxis("Vertical") < 0 || GameData.inY < 0)
@@ -128,7 +168,7 @@ public class Movement : MonoBehaviour
                                 }
                                 if (Rotation == 2)
                                 {
-                                    currRb.AddForce(0, 50000, 0);
+                                    currRb.AddForce(0, -50000, 0);
                                 }
 
                                 if (Rotation == 3)
@@ -141,11 +181,11 @@ public class Movement : MonoBehaviour
                                 currRb.drag = defaultDrag;
                             }
 
-                            GameData.ScanLines = true;
                             active = 1;
                         }
-                        else if ((Input.GetAxis("Vertical") <= 0 || GameData.inY <= 0) && active == 1)
+                        else if ((Input.GetAxis("Vertical") <= 0 && GameData.inY <= 0) && active == 1)
                         {
+                            print("active1");
                             active = 0;
 
                             if (Input.GetAxis("Vertical") == 0 || GameData.inY == 0)
@@ -155,88 +195,108 @@ public class Movement : MonoBehaviour
                         }
 
 
-                        if (Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") <= 0 && GameData.inX == 0 && GameData.inY <= 0)
+                        if (Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") <= 0 && GameData.inX == 0 && GameData.inY <= 0 && GameData.touchX == 0)
                         {
                             if (!contact && prevVtr.x != 0 && prevVtr.y != 0)
                             {
-                                prevCoord = false;
                                 prevVtr = curr.position;
                                 prevQuat = curr.rotation;
                                 prevRot = Rotation;
+
                                 GameData.prevX = curr.position.x;
 
                                 if (GameData.IterationCount > 0)
                                     GameData.IterationCount--;
+
+                                prevCoord = false;
                             }
                         }
-                        else
+
+
+                        if (Input.GetAxis("Horizontal") != 0 || GameData.inX != 0)
                         {
                             if (GameData.IterationCount > 0)
                                 GameData.IterationCount--;
-                        }
 
-                        if (Input.GetAxis("Horizontal") > 0 || GameData.inX > 0)
-                        {
-                            if (!contact)
+                            if (Input.GetAxis("Horizontal") > 0 || GameData.inX > 0)
                             {
-                                prevVtr = curr.position;
-                                prevQuat = curr.rotation;
-                                prevRot = Rotation;
+                                if (!contact)
+                                {
+                                    prevVtr = curr.position;
+                                    prevQuat = curr.rotation;
+                                    prevRot = Rotation;
 
-                                if (Rotation == 0)
-                                {
-                                    curr.Translate(1, 0, 0);
+                                    if (Rotation == 0)
+                                    {
+                                        curr.Translate(1, 0, 0);
+                                    }
+
+                                    if (Rotation == 1)
+                                    {
+                                        curr.Translate(0, 1, 0);
+                                    }
+                                    if (Rotation == 2)
+                                    {
+                                        curr.Translate(-1, 0, 0);
+                                    }
+
+                                    if (Rotation == 3)
+                                    {
+                                        curr.Translate(0, -1, 0);
+                                    }
+
+                                    if (contact)
+                                    {
+                                        curr.position = prevVtr;
+                                        curr.rotation = prevQuat;
+                                        Rotation = prevRot;
+
+                                        prevCoord = true;
+                                    }
                                 }
 
-                                if (Rotation == 1)
-                                {
-                                    curr.Translate(0, 1, 0);
-                                }
-                                if (Rotation == 2)
-                                {
-                                    curr.Translate(-1, 0, 0);
-                                }
-
-                                if (Rotation == 3)
-                                {
-                                    curr.Translate(0, -1, 0);
-                                }
+                                GameData.inX = 0;
                             }
 
-                            GameData.inX = 0;
-                        }
-
-                        if (Input.GetAxis("Horizontal") < 0 || GameData.inX < 0)
-                        {
-                            if (!contact)
+                            if (Input.GetAxis("Horizontal") < 0 || GameData.inX < 0)
                             {
-
-                                prevVtr = curr.position;
-                                prevQuat = curr.rotation;
-                                prevRot = Rotation;
-
-                                if (Rotation == 0)
+                                if (!contact)
                                 {
-                                    curr.Translate(-1, 0, 0);
-                                }
 
-                                if (Rotation == 1)
-                                {
-                                    curr.Translate(0, -1, 0);
-                                }
-                                if (Rotation == 2)
-                                {
-                                    curr.Translate(1, 0, 0);
-                                }
+                                    prevVtr = curr.position;
+                                    prevQuat = curr.rotation;
+                                    prevRot = Rotation;
 
-                                if (Rotation == 3)
-                                {
-                                    curr.Translate(0, 1, 0);
-                                }
+                                    if (Rotation == 0)
+                                    {
+                                        curr.Translate(-1, 0, 0);
+                                    }
 
+                                    if (Rotation == 1)
+                                    {
+                                        curr.Translate(0, -1, 0);
+                                    }
+                                    if (Rotation == 2)
+                                    {
+                                        curr.Translate(1, 0, 0);
+                                    }
+
+                                    if (Rotation == 3)
+                                    {
+                                        curr.Translate(0, 1, 0);
+                                    }
+
+                                    if (contact)
+                                    {
+                                        curr.position = prevVtr;
+                                        curr.rotation = prevQuat;
+                                        Rotation = prevRot;
+
+                                        prevCoord = true;
+                                    }
+                                }
                             }
                         }
-
                         GameData.inX = 0;
                     }
                 }
@@ -245,14 +305,8 @@ public class Movement : MonoBehaviour
 
             else
             {
-                if (enabled == true && contact == true && Input.GetAxis("Horizontal") == 0 && GameData.inX == 0)
+                if (enabled == true && contact == true)
                 {
-                    if (prevCoord)
-                    {
-                        curr.position = prevVtr;
-                        curr.rotation = prevQuat;
-                    }
-
                     enabled = false;
                     //  contact = false;
                     //  collide = false;
@@ -280,7 +334,6 @@ public class Movement : MonoBehaviour
 
                             SizeofSpawner = 0;
                             GameData.IterationCount++;
-                            GameData.SpawnerMode = 0;
                         }
                     }
                     if (GameData.PhysicsOn)
@@ -293,7 +346,7 @@ public class Movement : MonoBehaviour
                     {
                         Destroy(currRb);
                         Destroy(GetComponent<Movement>());
-                        GameData.SpawnerMode = 0;
+                        GameData.SpawnerMode = 2;
                     }
                 }
             }

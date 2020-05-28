@@ -18,7 +18,6 @@ public class DetectionModule : MonoBehaviour {
 
                 if (Offset)
                 {
-                  //  this.gameObject.GetComponent<MeshRenderer>().enabled = true;
                     obj.gameObject.transform.position = new Vector3(obj.gameObject.transform.position.x, obj.gameObject.transform.position.y - GameData.ClearLinesA, obj.gameObject.transform.position.z);
                     Offset = false;
                     print("y");
@@ -26,6 +25,7 @@ public class DetectionModule : MonoBehaviour {
 
                 if (Remove == true)
                 {
+                    //this.gameObject.GetComponent<MeshRenderer>().enabled = true;
                     Destroy(obj.gameObject);
                     print("DESTR");
                     Triggered = false;

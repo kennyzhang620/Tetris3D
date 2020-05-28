@@ -7,7 +7,7 @@ public class AnimatorPlayer : MonoBehaviour {
     // Use this for initialization
     Animator curr;
     public GameObject obj;
-    int active = 0;
+    int activeAP = 0;
     Camera cam;
     
     void Start()
@@ -40,7 +40,7 @@ public class AnimatorPlayer : MonoBehaviour {
         {
             cam.fieldOfView += 20;
         }
-        active = 1;
+        activeAP = 1;
     }
 
     public void DisabledGB()
@@ -50,7 +50,7 @@ public class AnimatorPlayer : MonoBehaviour {
 
     void Update()
     {
-        if (active == 1)
+        if (activeAP == 1)
         {
             if (Input.deviceOrientation == DeviceOrientation.Portrait || Screen.width < Screen.height)
             {

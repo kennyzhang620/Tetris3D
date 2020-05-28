@@ -9,7 +9,7 @@ namespace GameSettings
         private string Username = "User";
         private int Score = 0;
         private int UID;
-        
+
         // Initalizes the class
         public PlayerStats()
         {
@@ -67,7 +67,7 @@ namespace GameSettings
     };
     public class GameData : MonoBehaviour
     {
-     public static int SpawnerMode = 0;
+        public static int SpawnerMode = 0;
         public static int ClearLevel = -1;
         public static int ClearLines = 0;
         public static int ClearLinesA = 0;
@@ -80,13 +80,15 @@ namespace GameSettings
         public static int inX;
         public static int inY;
         public static int inZ;
+
+        public static float touchX;
         public static int IterationCount = 0;
 
         public static bool ScanLines;
         public static List<PlayerStats> Leaderboards;
 
-        
 
-        
+
+
     }
 }

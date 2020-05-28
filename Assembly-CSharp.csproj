@@ -57,9 +57,12 @@
      <Compile Include="Assets\GameData.cs" />
      <Compile Include="Assets\LoadScene.cs" />
      <Compile Include="Assets\Movement.cs" />
+     <Compile Include="Assets\RenderCells.cs" />
      <Compile Include="Assets\ResetPos.cs" />
      <Compile Include="Assets\Spawner.cs" />
      <Compile Include="Assets\Timer.cs" />
+     <Compile Include="Assets\TouchScreenInput.cs" />
+     <Compile Include="Assets\VirtualJoystick.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>D:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

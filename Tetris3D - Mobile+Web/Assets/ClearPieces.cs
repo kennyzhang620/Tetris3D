@@ -23,6 +23,7 @@ public class ClearPieces : MonoBehaviour {
 
         if (!GameData.PhysicsOn)
         {
+            // Occurs after blocks are marked by bottom script.
             if (GameData.SpawnerMode == 1)
             {
             //    print(GameData.SpawnerMode + " SM " + GameData.ClearLevel + "  " + GameData.ClearLinesA + " rmvarLines " + GameData.ClearLines);
@@ -58,10 +59,11 @@ public class ClearPieces : MonoBehaviour {
             }
         }
 
-        if (GameData.SpawnerMode == 0 || NewCycle == true)
+        if (GameData.ClearLines <= 14 && GameData.SpawnerMode == 2 && NewCycle == false || (GameData.ScanLines && GameData.ClearLines <= 14 && NewCycle == false))
         {
-           // print("NS");
-            GameData.ScanLines = false;
+            NewCycle = true;
+            GameData.ClearLines++;
+            
             for (int i = 0; i < 18; i++) // Doubles came back to bite me huh? (Neglect errors and they come back to bite me!)
             {
                 if (!Sensors[i].GetComponent<DetectionModule>().Triggered)
@@ -92,12 +94,26 @@ public class ClearPieces : MonoBehaviour {
                 GameData.ClearLevel = Level;
             }
 
-            NewCycle = false;
-
-            if (GameData.SpawnerMode != 0)
+            print("NS " + GameData.ClearLines + " > " + Level);
+           
+        }
+        else if (GameData.ClearLines > 0 && NewCycle)
+        {
+            if (GameData.ClearLines > 1)
             {
-                GameData.SpawnerMode = 0;
+                GameData.ClearLines--;
             }
+            else
+            {
+                GameData.ClearLines--;
+                if (GameData.SpawnerMode == 2)
+                    GameData.SpawnerMode = 0;
+
+                GameData.ScanLines = false;
+            }
+            print("NC");
+            
+            NewCycle = false;
         }
     }
 }
